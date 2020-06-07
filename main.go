@@ -1,11 +1,14 @@
 package main
 
 import (
-//"github.com/buaazp/fasthttprouter"
-//"github.com/valyala/fasthttp"
+	"GoProject/Controllers"
+	"github.com/buaazp/fasthttprouter"
+	_ "github.com/valyala/fasthttp"
 )
 
 func main() {
-	//router := fasthttprouter.New()
-	//router.GET("/{domain}", InfoDomain )
+	router := fasthttprouter.New()
+	//router.GET("/{domain}", Controllers.ListServers )
+	//router.GET("/history", Controllers.getListServers )
+
 }

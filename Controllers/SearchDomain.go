@@ -19,9 +19,8 @@ func InfoDomain(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(400)
-			return
+			return  http://26257:8080
 		}*/
-
 	host, err := getInfoSsl(name)
 	if err != nil {
 		w.WriteHeader(500)

@@ -2,13 +2,24 @@ package main
 
 import (
 	"GoProject/Controllers"
+	"fmt"
 	"github.com/buaazp/fasthttprouter"
-	_ "github.com/valyala/fasthttp"
+	"github.com/valyala/fasthttp"
+	"log"
 )
-
+func Default(ctx *fasthttp.RequestCtx)  {
+	fmt.Fprintf(ctx,"Welcome honey...")
+}
 func main() {
 	router := fasthttprouter.New()
-	//router.GET("/{domain}", Controllers.ListServers )
-	//router.GET("/history", Controllers.getListServers )
+	fmt.Print("INIT")
+	router.GET("/", Default)
+	router.GET("/history", Controllers.GetListServers)
+	router.GET("/information/:domain", Controllers.GetInfoDomain )
+	log.Fatal(fasthttp.ListenAndServe(":3000", router.Handler))
+
+
+
 
 }
+

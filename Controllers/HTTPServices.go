@@ -3,6 +3,8 @@ package Controllers
 import (
 	"GoProject/Models"
 	"encoding/json"
+	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -59,4 +61,32 @@ func whoIs(domain string) (Models.IPInfo, error) {
 	}
 
 	return ip_information, nil
+}
+func getLogo(name string) (string, string , error) {
+	response, err := http.Get("http://" +name)
+	if err != nil {
+		fmt.Print("ERROR")
+		log.Println(err)
+		return "","",err
+	}
+	defer response.Body.Close()
+
+	document, err := goquery.NewDocumentFromReader(response.Body)
+	if err != nil {
+		log.Println("Error loading HTTP response body. ", err)
+		return "","",err
+	}
+
+	title := document.Find("title").Text()
+	logo := ""
+	document.Find("link").Each(func(index int, element *goquery.Selection) {
+		rel, exists := element.Attr("rel")
+		if exists && (rel == "shortcut icon" || rel == "icon") {
+			href, exists1 := element.Attr("href")
+			if exists1 {
+				logo = href
+			}
+		}
+	})
+	return title, logo, nil
 }

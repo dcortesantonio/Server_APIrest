@@ -12,17 +12,17 @@ import (
 )
 
 func GetInfoDomain(ctx *fasthttp.RequestCtx) {
-	//ConectionDB()
-	fmt.Print(ctx, "<<<------INIT...->>>> ")
 
 	//Get URL parameter [domain]
 	str := ctx.UserValue("domain")
 	domainValue := fmt.Sprintf("%v", str)
 
 	//Evalue if the domain is valid
-	regex := regexp.MustCompile(`[a-zA-Z]+.[a-zA-Z]+`)
-	if regex.MatchString(domainValue) {
-		fmt.Print("Siiii pasa", domainValue)
+	regex := regexp.MustCompile(`(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]`)
+	if !regex.MatchString(domainValue){
+			log.Println("[Error] : Domain it's not valid.")
+			ctx.SetStatusCode(400)
+			return
 	}
 
 	//Get information of SSL and servers.
@@ -33,7 +33,7 @@ func GetInfoDomain(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	fmt.Print("\n firts infoSSL:", infoSSL.Host, infoSSL.Protocol, len(infoSSL.Endpoints))
+	fmt.Println("* Host:HTTOP SERVICE:", infoSSL.Host, infoSSL.Protocol, len(infoSSL.Endpoints))
 	//Information of the domain searched.
 	ServersConsulted := ModelsAPI.Server{}
 
@@ -42,7 +42,7 @@ func GetInfoDomain(ctx *fasthttp.RequestCtx) {
 	logo := ""
 	title, logo, err = getLogo(domainValue)
 	if err != nil {
-		log.Println("Error get Logo and title", err)
+		log.Println("[Error] : Get Logo and Title of domain ", err)
 	}
 	ServersConsulted.Title = title
 	ServersConsulted.Logo = logo
@@ -56,7 +56,7 @@ func GetInfoDomain(ctx *fasthttp.RequestCtx) {
 	ServerItems, Min_SSLGrade, err := getListServersItems(infoSSL.Endpoints)
 	ServersConsulted.Servers = ServerItems
 	ServersConsulted.Min_SSL_Grade = Min_SSLGrade
-	fmt.Print("\n infoSSL:::--> - " + ServersConsulted.Min_SSL_Grade + " - " + ServersConsulted.Logo + " - " + ServersConsulted.Title)
+	fmt.Print("\n ServersConsulted--> - " ,ServersConsulted, ServersConsulted.Min_SSL_Grade + " - " + ServersConsulted.Logo + " - " + ServersConsulted.Title)
 
 	//Review changes in previous and actual information: Grade and changes in servers.
 	gradeChange, serversChange := compareInformation(domainValue, ServersConsulted.Servers)
@@ -72,10 +72,12 @@ func GetInfoDomain(ctx *fasthttp.RequestCtx) {
 		fmt.Print("Insert Successfully!")
 	}
 
+	fmt.Println("**** Before marshall ", ServersConsulted )
+
 	//Generate JSON of information of servers.
 	res, err := json.Marshal(ServersConsulted)
 	if err != nil {
-		log.Println("Error marshaling. ", err)
+		log.Println("[Error] : Marshaling domain consulted ", err)
 		return
 	}
 	fmt.Print("-----END", res)
@@ -83,7 +85,6 @@ func GetInfoDomain(ctx *fasthttp.RequestCtx) {
 	//Return JSON of information of servers.
 	ctx.SetContentType("application/json; charset=utf-8")
 	ctx.SetStatusCode(200)
-	ctx.Response.SetBody(res)
 	ctx.Write(res)
 }
 
@@ -94,8 +95,9 @@ func getListServersItems(endPointsList []Models.Endpoint) ([]ModelsAPI.ServerIte
 	for _, endpoint := range endPointsList {
 		IP := endpoint.IpAddress
 		IPInfo, err := whoIs(IP)
+		fmt.Println(" from IP:" + IP + ",WHO IS", IPInfo.Query ,",",IPInfo.Country )
 		if err != nil {
-			log.Println("Error whois <IP>", err)
+			log.Println("[Error] : In Function whois <IP> ", err)
 			return ServerItems, Min_SSLGrade, err
 		}
 		serverItem := ModelsAPI.ServerItem{}
@@ -105,7 +107,8 @@ func getListServersItems(endPointsList []Models.Endpoint) ([]ModelsAPI.ServerIte
 			Min_SSLGrade = endpoint.SSL_Grade
 		}
 		serverItem.Country = IPInfo.CountryCode
-		serverItem.Owner = IPInfo.Org
+		serverItem.Owner = IPInfo.Isp
+		fmt.Println(" Server Item" ,serverItem )
 		ServerItems = append(ServerItems, serverItem)
 	}
 	err = nil
@@ -148,8 +151,15 @@ func compareInformation(domain string, actualServers []ModelsAPI.ServerItem) (st
 	previousServers := getPreviousServersItems(domain)
 	if reflect.DeepEqual(previousServers, actualServers) == true {
 		serversChange = false
+		fmt.Println("***|***NO CAMBIARON")
 	}
+	fmt.Println(" *****CAMBIARON " )
+
+	fmt.Println(" prev:", previousServers )
+	fmt.Println(" actual:", actualServers )
+
 
 	previous_SSLGrade := getPrevious_SSL_Grade(domain)
+
 	return previous_SSLGrade, serversChange
 }

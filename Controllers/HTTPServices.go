@@ -3,7 +3,6 @@ package Controllers
 import (
 	"GoProject/Models"
 	"encoding/json"
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"log"
@@ -15,7 +14,7 @@ func getInfoSsl(domain string) (Models.Host, error) {
 	//Parameter: domain
 	response, err := http.Get("https://api.ssllabs.com/api/v3/analyze?host=" + domain)
 	if err != nil {
-		log.Printf(" Request HTTP failed : [Error %s\n]", err)
+		log.Fatal("[Error] : Request HTTP SSL failed ", err)
 		return Models.Host{}, err
 	}
 	defer response.Body.Close()
@@ -41,7 +40,7 @@ func whoIs(domain string) (Models.IPInfo, error) {
 	//Parameters: IP
 	response, err := http.Get("http://ip-api.com/json/" + domain)
 	if err != nil {
-		log.Println("The HTTP request failed with error %s\n", err)
+		log.Fatal("[Error] : Request HTTP who is failed ", err)
 		return Models.IPInfo{}, err
 	}
 	defer response.Body.Close()
@@ -63,17 +62,17 @@ func whoIs(domain string) (Models.IPInfo, error) {
 	return ip_information, nil
 }
 func getLogo(name string) (string, string , error) {
+
 	response, err := http.Get("http://" +name)
 	if err != nil {
-		fmt.Print("ERROR")
-		log.Println(err)
+		log.Fatal("[Error] : Request HTTP failed ",err)
 		return "","",err
 	}
 	defer response.Body.Close()
 
 	document, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
-		log.Println("Error loading HTTP response body. ", err)
+		log.Println("[Error] Response body, NewDocument ", err)
 		return "","",err
 	}
 

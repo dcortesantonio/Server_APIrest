@@ -13,7 +13,10 @@ var db *sql.DB
 
 //Documentation: https://www.cockroachlabs.com/docs/v20.1/build-a-go-app-with-cockroachdb.html#step-1-install-the-go-pq-driver
 
-//Methods of List of Domains Searched
+// This method gives the history of domains searched.
+// Returns: the list of domains searched.
+//     Responses:
+//       ServersConsulted
 func getListServersDB() ModelsAPI.ServersConsulted {
 
 	fmt.Println("Init getListServersDB")
@@ -54,6 +57,11 @@ func getListServersDB() ModelsAPI.ServersConsulted {
 	}
 	return history
 }
+
+// This method gives information of a domain.
+// Returns: the information of a domain.
+//     Responses:
+//       Server
 func getInfoDomain(idDomain int64) ModelsAPI.Server {
 
 	fmt.Println(" Init getInfoDomain Server")
@@ -115,8 +123,11 @@ func getInfoDomain(idDomain int64) ModelsAPI.Server {
 	serverInfo.Servers = serverItems
 	return serverInfo
 }
-//End of Methods of List of Domains Searched
 
+// This method insert a domain in the Data Base.
+// Returns: if the insert has successfully or not.
+//     Responses:
+//       bool
 func insertDomain(domain string, information  ModelsAPI.Server)  (bool){
 	//Open Data base SERVERDB.
 	fmt.Println(" Init insertDomain  ")
@@ -141,6 +152,11 @@ func insertDomain(domain string, information  ModelsAPI.Server)  (bool){
 	}
 	return true
 }
+
+// This method insert a server in the Data Base.
+// Returns: if the insert has successfully or not.
+//     Responses:
+//       bool
 func insertServer(idDomain int64,  information ModelsAPI.Server) bool{
 	//Open Data base SERVERDB.
 	fmt.Println(" Init insertServer ")
@@ -168,6 +184,10 @@ func insertServer(idDomain int64,  information ModelsAPI.Server) bool{
 	return succes
 }
 
+// This method insert servers informations in the Data Base.
+// Returns: if the insert has successfully or not.
+//     Responses:
+//       bool
 func insertServerItem(serverID int64,  serverItems []ModelsAPI.ServerItem) bool {
 	//Open Data base SERVERDB.
 	fmt.Println(" Init insertServerItem")
@@ -191,6 +211,11 @@ func insertServerItem(serverID int64,  serverItems []ModelsAPI.ServerItem) bool 
 	db.Close()
 	return true
 }
+
+// This method gives previous information of servers.
+// Returns: the list of servers.
+//     Responses:
+//       ServerItem
 func getPreviousServersItems(name string) []ModelsAPI.ServerItem {
 
 	//Open Data base SERVERDB.
@@ -233,6 +258,10 @@ func getPreviousServersItems(name string) []ModelsAPI.ServerItem {
 	return servers
 }
 
+// This method gives previous SSL of a domain.
+// Returns: the list of servers.
+//     Responses:
+//       string
 func getPrevious_SSL_Grade(name string) string {
 
 	//Open Data base SERVERDB.

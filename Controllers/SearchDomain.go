@@ -10,7 +10,13 @@ import (
 	"reflect"
 	"regexp"
 )
-
+// swagger:route GET /history:domain
+// Returns the information of a domain.
+//     Produces:
+//     - application/json
+//     Responses:
+//       200: Server
+//       400: Client Error
 func GetInfoDomain(ctx *fasthttp.RequestCtx) {
 
 	//Get URL parameter [domain]
@@ -88,6 +94,12 @@ func GetInfoDomain(ctx *fasthttp.RequestCtx) {
 	ctx.Write(res)
 }
 
+// This method fins the list of servers.
+// Returns: the list if servers and the minimum SSL grade of servers.
+//     Responses:
+//		 ServerItem
+// 		 string
+//       bool
 func getListServersItems(endPointsList []Models.Endpoint) ([]ModelsAPI.ServerItem, string, error) {
 	Min_SSLGrade := "A+"
 	var err error
@@ -115,6 +127,10 @@ func getListServersItems(endPointsList []Models.Endpoint) ([]ModelsAPI.ServerIte
 	return ServerItems, Min_SSLGrade, err
 }
 
+// This method compare and find the minimum SSL grade.
+// Returns: if the actual minimum SSL grade still the same.
+//     Responses:
+//       bool
 func findMinGrade(SSL_Grade string, min_SSL_Grade string) bool {
 	MapSSL_Grades := make(map[string]int)
 	MapSSL_Grades["F-"] = 0
@@ -146,6 +162,12 @@ func findMinGrade(SSL_Grade string, min_SSL_Grade string) bool {
 	}
 	return false
 }
+
+// This method compare previous and new information of a domain.
+// Returns: the previous SSL grade and if the servers change.
+//     Responses:
+//		 string
+//       bool
 func compareInformation(domain string, actualServers []ModelsAPI.ServerItem) (string, bool) {
 	serversChange := true
 	previousServers := getPreviousServersItems(domain)

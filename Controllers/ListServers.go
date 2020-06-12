@@ -3,24 +3,31 @@ package Controllers
 import (
 	"GoProject/ModelsAPI"
 	"encoding/json"
-	"fmt"
 	"github.com/valyala/fasthttp"
 	"log"
 )
-
+// swagger:route GET /history
+// Returns the list of domains searched.
+//     Produces:
+//     - application/json
+//     Responses:
+//       200: ServersConsulted
+//       400: Client Error
 func GetListServers(ctx *fasthttp.RequestCtx) {
-	fmt.Print(ctx,"1")
+	//The list of the domains searched
 	listDomains := ModelsAPI.ServersConsulted{}
-	fmt.Print(ctx,"2")
-	//DB consul
+
+	//Get the list of domains searched.
 	listDomains = getListServersDB()
+	//Generate JSON of domains searched.
 	res, err := json.Marshal(listDomains)
 	if err != nil {
-		log.Println("[Error]: Marshaling struct ServerConsuled. ", err)
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		log.Println("[Error]: Marshaling struct ServerConsuled ", err)
+		ctx.SetStatusCode(400)
+		return
 	}
+	//Return JSON of domains searched.
 	ctx.SetContentType("application/json; charset=utf-8")
 	ctx.SetStatusCode(200)
-	ctx.Response.SetBody(res)
 	ctx.Write(res)
 }

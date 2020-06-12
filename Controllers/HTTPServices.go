@@ -9,6 +9,12 @@ import (
 	"net/http"
 )
 
+// This method gives the SLL and servers of a domain by a HTTP service.
+// Parameters: a string that contains a domain.
+// Returns: the information of SSL and server.
+//     Responses:
+//       Host
+//		 error
 func getInfoSsl(domain string) (Models.Host, error) {
 	//Request to http to get sll and servers information
 	//Parameter: domain
@@ -35,6 +41,12 @@ func getInfoSsl(domain string) (Models.Host, error) {
 	return actual_host, nil
 }
 
+// This method gives the information of an IP by a HTTP service.
+// Parameters: a string that contains an IP.
+// Returns: the information of an IP.
+//     Responses:
+//       IPInfo
+//		 error
 func whoIs(domain string) (Models.IPInfo, error) {
 	//Request to http to get country information
 	//Parameters: IP
@@ -61,6 +73,15 @@ func whoIs(domain string) (Models.IPInfo, error) {
 
 	return ip_information, nil
 }
+
+
+// This method gives the information of a domain by a HTTP service.
+// Parameters: a string that contains a domain.
+// Returns: the logo and title of the domain.
+//     Responses:
+//       string
+//		 string
+//		 error
 func getLogo(name string) (string, string , error) {
 
 	response, err := http.Get("http://" +name)
